@@ -1,5 +1,8 @@
 # MSiA423 Template Repository
 
+Developer: Zhiyang (Iris) Chen
+QA support: Allen Xu
+
 <!-- toc -->
 
 - [Directory structure](#directory-structure)
