@@ -4,6 +4,14 @@ Developer: Zhiyang (Iris) Chen
 
 QA support: Allen Xu
 
+## Project Charter
+
+### Vision
+
+### Mission
+
+### Success Criteria
+
 <!-- toc -->
 
 - [Directory structure](#directory-structure)
