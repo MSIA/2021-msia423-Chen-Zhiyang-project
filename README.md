@@ -22,9 +22,18 @@ The dataset used is from [Food.com](https://www.kaggle.com/shuyangli94/food-com-
 ### Success Criteria
 
 #### 1. Model Performance Metric:
-The model will be tested
+The model will be tested on the Food.com users interaction dataset. It is considered a success if the recommender system manage to  
+As for the predicted score score, the desired Cross-Validation R-squared prior to deployment is 0.7.
 
 #### 2. Business Metrics:
+In ideal, an A/B testing should be conducted and compare 
+
+
+user rating
+the rating of recipe 
+It is condiered a success if the rating on Recipe recommended is higher than that of
+
+
 
 
 
