@@ -1,4 +1,4 @@
-# MSiA423 Template Repository
+# MSiA423 What to Cook Next?
 
 Developer: Zhiyang (Iris) Chen
 
@@ -8,9 +8,25 @@ QA support: Allen Xu
 
 ### Vision
 
+Everybody enjoys food, and preparing delicious meals can be a rewarding relaxation after a busy day. Nevertheless, even an all-time favorite dish becomes less attractive if one cooks and eats the exactly same thing repeatedly. Yet, exploring new recipes that fit one's taste may not be easy, especially for busy people: it is usually a process of trial and error, taking time and effort. This application, therefore, helps people to find new recipes that match their taste and skillset, adding a twist to their daily meals.
+
 ### Mission
 
+Users will enter the food they like (there may exist search suggestions to match a recipe that existed in the database), and there is also an option to enter what they want to use as ingredients. Then the app will recommend the top 10 recipes (made with the ingredients if provided) that are similar to the given dish and have the highest predicted scores.
+
+For example, the user likes "Mac & Cheese" and the app will recommend things like "The Ultimate Spaghetti Carbonara Recipe" and will predict the user would score 4/5 for this recipe.
+
+The dataset used is from [Food.com](https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions). It includes both recipes and user interactions with the recipes. It has 180K+ recipes and 700K+ recipe reviews, covering 18 years of user interactions.
+
+
 ### Success Criteria
+
+#### 1. Model Performance Metric:
+The model will be tested
+
+#### 2. Business Metrics:
+
+
 
 <!-- toc -->
 
