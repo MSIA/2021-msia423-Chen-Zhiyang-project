@@ -18,7 +18,7 @@ Users will enter the food they like (there may exist search suggestions to match
 
 For example, the user likes "Mac & Cheese" and the app will recommend things like "The Ultimate Spaghetti Carbonara Recipe" and will predict the user would score 4/5 for this recipe.
 
-The dataset used is from [Food.com](https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions). It includes both recipes and user interactions with the recipes. It has 180K+ recipes and 700K+ recipe reviews, covering 18 years of user interactions.
+The dataset used is from [Food.com](https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions) in Kaggle. It includes both recipes and user interactions with the recipes. It has 180K+ recipes and 700K+ recipe reviews, covering 18 years of user interactions.
 
 
 ### Success Criteria
@@ -30,6 +30,10 @@ The model will be tested on the Food.com users interaction dataset. For the reco
 Ideally, an A/B testing should be conducted. Two metrics should be considered: the amount of time spent to find out recipes and the ratings for the new recipe. We would compare between the group of users who select new recipe using the app and the group who do not.
 Overall, the successful deployment of the app should increase users' satisfaction with the experience of searching and cooking, helping people to find recipes that fit their taste in a shorter amount of time.
 
+## Data Acquisition
+
+The dataset is available on Kaggle: [Food.com Recipes and Interactions](https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions), which is a crawled data from Food.com (GeniusKitchen) online recipe aggregator. 
+The files used in this project are ```RAW_interactions.csv``` and ```RAW_recipes.csv```. You can download these two datasets to the ```\data``` folder.
 
 <!-- toc -->
 
