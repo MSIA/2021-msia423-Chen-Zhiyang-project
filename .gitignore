@@ -6,7 +6,16 @@ __pycache__/
 .idea/
 .log
 .ipynb_checkpoints/
-
+.mysqlconfig
+.s3config
+.vscode/
+*.egg-info/
+.ipynb_checkpoints
+.env
+.venv
+env/
+venv/
+.mypy_cache/
 
 data/*
 !data/sample/
