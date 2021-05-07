@@ -14,8 +14,8 @@ __pycache__/
 env/
 venv/
 .mypy_cache/
-.sh
-.db
+*.sh
+*.db
 config/local
 
 !.gitkeep
