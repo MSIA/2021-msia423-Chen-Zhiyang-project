@@ -1,4 +1,5 @@
-# MSiA423 What to Cook Next?
+# MSiA423 Project: What to Cook Next?
+<!-- toc -->
 
 --Develop Version--
 
@@ -33,24 +34,24 @@ Overall, the successful deployment of the app should increase users' satisfactio
 ## Data Acquisition
 
 The dataset is available on Kaggle: [Food.com Recipes and Interactions](https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions), which is a crawled data from Food.com (GeniusKitchen) online recipe aggregator. 
-The files used in this project are ```RAW_interactions.csv``` and ```RAW_recipes.csv```. You can download these two datasets to the ```\data``` folder.
+The files used in this project are `RAW_interactions.csv` and `RAW_recipes.csv`. You can download these two datasets to the `\data` folder. 
+
+Small samples of both of the datasets (`sample_RAW_interactions.csv` and `sample_RAW_recipes.csv`) are already included in `\data\sample` folder.
 
 <!-- toc -->
 
 - [Directory structure](#directory-structure)
-- [Running the app](#running-the-app)
-  * [1. Initialize the database](#1-initialize-the-database)
-    + [Create the database with a single song](#create-the-database-with-a-single-song)
-    + [Adding additional songs](#adding-additional-songs)
-    + [Defining your engine string](#defining-your-engine-string)
-      - [Local SQLite database](#local-sqlite-database)
-  * [2. Configure Flask app](#2-configure-flask-app)
-  * [3. Run the Flask app](#3-run-the-flask-app)
-- [Running the app in Docker](#running-the-app-in-docker)
-  * [1. Build the image](#1-build-the-image)
-  * [2. Run the container](#2-run-the-container)
-  * [3. Kill the container](#3-kill-the-container)
-  * [Workaround for potential Docker problem for Windows.](#workaround-for-potential-docker-problem-for-windows)
+- [Database Management Using Docker](#database-management-using-docker)
+  * [1. Build the Image](#1-build-the-image)
+  * [2. Interacting with S3 Bucket](#2-interacting-with-s3-bucket)
+    + [1) Set up configuration for S3](#1-set-up-configuration-for-s3)
+    + [2) Upload Raw_Datasets to S3 Bucket](#2-upload-raw-datasets-to-s3-bucket)
+    + [3) Download Raw Datasets from S3 Bucket](#3-download-raw-datasets-from-s3-bucket)
+  * [3. Create the Database](#3-create-the-database)
+    + [1) Create RDS MySQL Database](#1-create-rds-mysql-database)
+      - [a. Set up configuration for RDS MySQL](#a-set-up-configuration-for-rds-mysql)
+      - [b. Create DataBase in RDS MySQL](#b-create-database-in-rds-mysql)
+     
 
 <!-- tocstop -->
 
@@ -98,22 +99,124 @@ The files used in this project are ```RAW_interactions.csv``` and ```RAW_recipes
 ├── requirements.txt                  <- Python package dependencies 
 ```
 
-## Running the app
-### 1. Initialize the database 
+## Database Management Using Docker
 
-#### Create the database 
-To create the database in the location configured in `config.py` run: 
+There exist two sets of data for this project: one is the raw data stored in S3; 
+the other is the recipe detailed information stored in RDS-hosted MySQL database, which 
+will be displaced to the app user when providing recommendations to them.
 
-`python run.py create_db --engine_string=<engine_string>`
+### 1. Build the image 
 
-By default, `python run.py create_db` creates a database at `sqlite:///data/tracks.db`.
+The Dockerfile for accessing s3 bucket and building database is in the root. 
+To build the image, run from this directory (the root of the repo): 
 
-#### Adding songs 
-To add songs to the database:
+```bash
+ docker build -t recipe .
+```
 
-`python run.py ingest --engine_string=<engine_string> --artist=<ARTIST> --title=<TITLE> --album=<ALBUM>`
+This command builds the Docker image, with the tag `recipe`, based on the instructions in `Dockerfile` and the files existing in this directory.
 
-By default, `python run.py ingest` adds *Minor Cause* by Emancipator to the SQLite database located in `sqlite:///data/tracks.db`.
+The entry point is `python3`, and thus when you run the image as a container, the command python3 is run, followed by the arguments given in the docker run command after the image name.
+
+### 2. Interacting with S3 Bucket
+
+The S3 Bucket stores all the raw datasets of this project.
+
+#### 1) Set up configuration for S3
+For your convenience, you can first config your environment for the following.
+
+```bash
+export AWS_ACCESS_KEY_ID=<Your AWS Access Key ID>
+export AWS_SECRET_ACCESS_KEY=<Your AWS Access Key>
+```
+
+#### 2) Upload Raw Datasets to S3 Bucket
+To upload datasets, please run:
+
+```bash
+docker run -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY recipe run.py s3 \
+    --s3path <s3 directory path1> <s3 directory path2> \
+    --local_path <local directory path1> <local directory path2>
+```
+
+The default `s3path` are <br>
+`s3://2021-msia423-chen-zhiyang/raw_data/RAW_recipes.csv` and <br>
+`s3://2021-msia423-chen-zhiyang/raw_data/RAW_interactions.csv`.
+
+The default `local_path` are <br>
+`data/sample/sample_RAW_recipes.csv` and <br>
+`data/sample/sample_RAW_interactions.csv`.
+
+#### 3) Download Raw Datasets from S3 Bucket
+To upload datasets, please run:
+
+```bash
+docker run -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY recipe run.py s3 --download\
+    --s3path <s3 directory path1> <s3 directory path2> \
+    --local_path <local directory path1> <local directory path2>
+```
+
+The default `s3path` and `local_path` are the same as upload.
+
+**Notes:**
+1. You can also indicate only one s3 path and one local path, but remember that the number of s3 paths 
+should match number of local paths.
+2. There are also two small sample datasets for testing purpose in the s3 bucket. Their paths are:<br>
+`s3://2021-msia423-chen-zhiyang/raw_data/sample_RAW_recipes.csv` and 
+`s3://2021-msia423-chen-zhiyang/raw_data/sample_RAW_interactions.csv`.
+
+### 3. Create the Database 
+
+You can create the database in either the RDS MYSQL database or a local location.
+
+#### 1) Create RDS MySQL Database
+
+##### a. Set up configuration for RDS MySQL
+
+For your convenience, you can first config your environment for the following.
+
+```bash
+export MYSQL_USER=<Your RDS MySQL User Name>
+export MYSQL_PASSWORD=<Your RDS MySQL Password>
+export MYSQL_HOST=nw-msia423-zcm9834.cgtjrvditdsm.us-east-1.rds.amazonaws.com
+export MYSQL_PORT=3306
+export DATABASE_NAME=msia423_db
+```
+
+##### b. Create DataBase in RDS MySQL
+
+To create the database in RDS MySQL using docker, please first configure the above, then **connect to Northwestern VPN**, 
+and then run:
+
+```bash
+docker run -e MYSQL_USER \
+-e MYSQL_PASSWORD \
+-e MYSQL_PORT \
+-e DATABASE_NAME \
+-e MYSQL_HOST \
+recipe run.py create_db
+```
+
+**Note:**
+1. Since the security group of the default HOST is set for Northwestern VPN `165.124.160.0/21` access, 
+   please make sure that you are on Northwestern VPN before connecting to the database.
+
+#### 2) Create Local SQLite Database
+
+You can also create a local SQLite database. If no `MYSQL_HOST` provided, the `SQLALCHEMY_DATABASE_URI` 
+will be set to a local SQLite database. 
+
+```bash
+docker run recipe run.py create_db --engine_string=<engine_string>
+```
+
+By default, the command creates a database at `sqlite:///data/recipe.db`. 
+You can also configure your own local SQLite database by changing the `engine_string` 
+or by modifying the configuration in `config/flaskconfig.py`.
+
+
+# BELOW IS NOT CHANGED
+
 
 #### Defining your engine string 
 A SQLAlchemy database connection is defined by a string with the following format:
@@ -164,59 +267,6 @@ python app.py
 ```
 
 You should now be able to access the app at http://0.0.0.0:5000/ in your browser.
-
-## Running the app in Docker 
-
-### 1. Build the image 
-
-The Dockerfile for running the flask app is in the `app/` folder. To build the image, run from this directory (the root of the repo): 
-
-```bash
- docker build -f app/Dockerfile -t pennylane .
-```
-
-This command builds the Docker image, with the tag `pennylane`, based on the instructions in `app/Dockerfile` and the files existing in this directory.
- 
-### 2. Run the container 
-
-To run the app, run from this directory: 
-
-```bash
-docker run -p 5000:5000 --name test pennylane
-```
-You should now be able to access the app at http://0.0.0.0:5000/ in your browser.
-
-This command runs the `pennylane` image as a container named `test` and forwards the port 5000 from container to your laptop so that you can access the flask app exposed through that port. 
-
-If `PORT` in `config/flaskconfig.py` is changed, this port should be changed accordingly (as should the `EXPOSE 5000` line in `app/Dockerfile`)
-
-### 3. Kill the container 
-
-Once finished with the app, you will need to kill the container. To do so: 
-
-```bash
-docker kill test 
-```
-
-where `test` is the name given in the `docker run` command.
-
-### Example using `python3` as an entry point
-
-We have included another example of a Dockerfile, `app/Dockerfile_python` that has `python3` as the entry point such that when you run the image as a container, the command `python3` is run, followed by the arguments given in the `docker run` command after the image name. 
-
-To build this image: 
-
-```bash
- docker build -f app/Dockerfile_python -t pennylane .
-```
-
-then run the `docker run` command: 
-
-```bash
-docker run -p 5000:5000 --name test pennylane app.py
-```
-
-The new image defines the entry point command as `python3`. Building the sample PennyLane image this way will require initializing the database prior to building the image so that it is copied over, rather than created when the container is run. Therefore, please **do the step [Create the database with a single song](#create-the-database-with-a-single-song) above before building the image**.
 
 # Testing
 
