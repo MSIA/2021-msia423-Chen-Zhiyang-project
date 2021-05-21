@@ -148,7 +148,7 @@ The default `local_path` are <br>
 `data/sample/sample_RAW_interactions.csv`.
 
 #### 3) Download Raw Datasets from S3 Bucket
-To upload datasets, please run:
+To download datasets, please run:
 
 ```bash
 docker run -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY recipe run.py s3 --download\
