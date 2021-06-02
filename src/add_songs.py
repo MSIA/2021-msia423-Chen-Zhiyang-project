@@ -12,6 +12,8 @@ logger.setLevel("INFO")
 Base = declarative_base()
 
 
+# Kept for now so that wouldn't mess up some other references
+
 class Tracks(Base):
     """Create a data model for the database to be set up for capturing songs
 

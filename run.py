@@ -1,17 +1,38 @@
 import argparse
 
 import logging.config
-logging.config.fileConfig('config/logging/local.conf')
-logger = logging.getLogger('penny-lane-pipeline')
+from config.flaskconfig import LOGGING_CONFIG
 
-from src.add_songs import TrackManager, create_db
+from src.rds import RecipeManager, create_db
+from src.s3 import upload_file_to_s3, download_file_from_s3
 from config.flaskconfig import SQLALCHEMY_DATABASE_URI
+
+logging.config.fileConfig(LOGGING_CONFIG)
+logger = logging.getLogger('recipe-recommender-pipeline')
+
+
 
 if __name__ == '__main__':
 
-    # Add parsers for both creating a database and adding songs to it
+    logger.info("Default DB URI: " + SQLALCHEMY_DATABASE_URI)
+
+    # Add parsers for
+    # 1. uploading to or downloading from s3
+    # 2. creating a database
+    # 3. adding recipe to the database
     parser = argparse.ArgumentParser(description="Create and/or add data to database")
     subparsers = parser.add_subparsers(dest='subparser_name')
+
+    # Sub-parser for interacting with s3
+    sb_s3 = subparsers.add_parser("s3", description="Interacting with s3")
+    sb_s3.add_argument('--download', default=False, action='store_true',
+                       help="If true, will download from s3.")
+    sb_s3.add_argument('--s3path', nargs='+', default=['s3://2021-msia423-chen-zhiyang/raw_data/sample_RAW_recipes.csv',
+                                                       's3://2021-msia423-chen-zhiyang/raw_data/sample_RAW_interactions.csv'],
+                       help="One or more locations (files) in s3.")
+    sb_s3.add_argument('--local_path', nargs='+', default=['data/sample/sample_RAW_recipes.csv',
+                                                           'data/sample/sample_RAW_interactions.csv'],
+                       help="One or more local locations (files).")
 
     # Sub-parser for creating a database
     sb_create = subparsers.add_parser("create_db", description="Create database")
@@ -20,22 +41,49 @@ if __name__ == '__main__':
 
     # Sub-parser for ingesting new data
     sb_ingest = subparsers.add_parser("ingest", description="Add data to database")
-    sb_ingest.add_argument("--artist", default="Emancipator", help="Artist of song to be added")
-    sb_ingest.add_argument("--title", default="Minor Cause", help="Title of song to be added")
-    sb_ingest.add_argument("--album", default="Dusk to Dawn", help="Album of song being added")
-    sb_ingest.add_argument("--engine_string", default='sqlite:///data/tracks.db',
+    sb_ingest.add_argument("-p", "--print", action='store_true', default=False,
+                           help="If given, will print the updated table.")
+    sb_ingest.add_argument("--id", default="123456789", help="Id of the recipe")
+    sb_ingest.add_argument("--name", default="super mysterious unknown recipe", help="Name of the recipe")
+    sb_ingest.add_argument("--description", default="A mysterious recipe!", help="Short Description of the Recipe")
+    sb_ingest.add_argument("--minutes", default="1000", help="How long it takes to cook the recipe")
+    sb_ingest.add_argument("--top_tags", default="[mysterious, unknown]", help="most important tags of the recipe")
+    sb_ingest.add_argument("--calories", default="0.0", help="calories in the recipe")
+    sb_ingest.add_argument("--total_fat", default="0.0", help="total amount of fat in the recipe")
+    sb_ingest.add_argument("--sugar", default="0.0", help="amount of sugar in the recipe")
+    sb_ingest.add_argument("--sodium", default="0.0", help="amount of sodium in the recipe")
+    sb_ingest.add_argument("--protein", default="0.0", help="amount of protein in the recipe")
+    sb_ingest.add_argument("--saturated_fat", default="0.0", help="amount of saturated fat in the recipe")
+    sb_ingest.add_argument("--carbs", default="0.0", help="amount of carbohydrates in the recipe")
+    sb_ingest.add_argument("--num_of_ingredients", default="0", help="number of ingredients of the recipe.")
+    sb_ingest.add_argument("--all_ingredients", default="[food, recipe, hope]", help="ingredients of the recipe.")
+    sb_ingest.add_argument("--num_of_steps", default="1", help="number of steps in the recipe")
+    sb_ingest.add_argument("--steps", default="1. cook your meals!", help="the steps of the recipe")
+    sb_ingest.add_argument("--engine_string", default=SQLALCHEMY_DATABASE_URI,
                            help="SQLAlchemy connection URI for database")
 
     args = parser.parse_args()
     sp_used = args.subparser_name
-    if sp_used == 'create_db':
-        create_db(args.engine_string)
+    if sp_used == 's3':
+        if len(args.s3path) != len(args.local_path):
+            logger.error("Number of s3 paths (" + str(len(args.s3path)) + ") and local paths ("
+                         + str(len(args.local_path)) + ") mismatch.")
+        else:
+            if args.download:
+                download_file_from_s3(args.local_path, args.s3path)
+            else:
+                upload_file_to_s3(args.local_path, args.s3path)
+    elif sp_used == 'create_db':
+        create_db(engine_string=args.engine_string)
     elif sp_used == 'ingest':
-        tm = TrackManager(engine_string=args.engine_string)
-        tm.add_track(args.title, args.artist, args.album)
-        tm.close()
+        rm = RecipeManager(engine_string=args.engine_string)
+        rm.add_recipe(id=args.id, name=args.name, description=args.description, minutes=args.minutes,
+                      top_tags=args.top_tags, calories=args.calories, total_fat=args.total_fat, sugar=args.sugar,
+                      sodium=args.sodium, protein=args.protein, saturated_fat=args.saturated_fat, carbs=args.carbs,
+                      num_of_ingredients=args.num_of_ingredients, all_ingredients=args.all_ingredients,
+                      num_of_steps=args.num_of_steps, steps=args.steps)
+        if args.print:
+            rm.print_table()
+        rm.close()
     else:
         parser.print_help()
-
-
-
