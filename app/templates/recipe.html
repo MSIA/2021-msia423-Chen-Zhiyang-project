@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="static/index.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <div style="padding: 10px; background-color: rgba(255, 255, 255, 0.5);">
+        <h1>
+         <a href = "{{ url_for('index') }}" style="text-decoration: none; color:darkred">Recipe Recommender</a>
+        </h1>
+
+        <p>
+            This is a recipe recommender. Please search for recipe that you want to find a similar subsitute.
+        </p>
+
+        <!--Make sure the form has the autocomplete function switched off:-->
+        <form autocomplete="off">
+            <div class="autocomplete" style="width:300px;">
+                <input id="myInput" type="text" name="myRecipe" placeholder="Recipe">
+            </div>
+            <input type="submit">
+        </form>
+    </div>
+
+    <script src="../static/index.js"></script>
+</body>
+</html>

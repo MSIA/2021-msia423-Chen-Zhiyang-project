@@ -1,0 +1,60 @@
+acquire:
+  acquire:
+    source_url: https://archive.ics.uci.edu/ml/machine-learning-databases/undocumented/taylor/cloud.data
+    local_dump_path: ./data/clouds.data
+
+clean:
+  clean:
+    columns:
+      - visible_mean
+      - visible_max
+      - visible_min
+      - visible_mean_distribution
+      - visible_contrast
+      - visible_entropy
+      - visible_second_angular_momentum
+      - IR_mean
+      - IR_max
+      - IR_min
+    response_tag: class
+
+featurize:
+  featurize:
+    target_column: class
+    config:
+      get_log:
+        target_col: visible_entropy
+        feature_name: log_entropy
+      get_column_multiply:
+        col1: visible_contrast
+        col2: visible_entropy
+        feature_name: entropy_x_contrast
+      get_subtraction:
+        col1: IR_max
+        col2: IR_min
+        feature_name: IR_range
+      get_subtraction_and_divide:
+        col1: IR_max
+        col2: IR_min
+        divide_col: IR_mean
+        feature_name: IR_norm_range
+
+eda_plots:
+  eda_plots:
+    plot_path: ./plots
+    target_column: class
+
+model:
+  Model:
+    rf_config:
+      n_estimators: 10
+      max_depth: 10
+    model_dump_path: ./model/model.pkl
+    used_feature:
+      - log_entropy
+      - IR_norm_range
+      - entropy_x_contrast
+    target_column: class
+    test_size: 0.4
+    random_seed: 1
+
