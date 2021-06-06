@@ -12,19 +12,70 @@
          <a href = "{{ url_for('index') }}" style="text-decoration: none; color:darkred">Recipe Recommender</a>
         </h1>
 
+        <h2 class="capitalize">
+            Recommended Recipe: {{ recipe.name }}
+        </h2>
         <p>
-            This is a recipe recommender. Please search for recipe that you want to find a similar subsitute.
+            <u><strong>Description:</strong></u>
+            <br>{{ recipe.description }}
+        </p>
+        <p>
+            <u><strong>Ingredients:</strong></u>
+            <br>{{ recipe.ingredients }}
+        </p>
+        <p>
+            <u><strong>Nutrition:</strong></u>
+        </p>
+        <table>
+            <tbody>
+                <tr>
+                    <td><strong>Calories</strong></td>
+                    <td>{{ '%0.1f' % recipe.calories|float }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Total Fat</strong></td>
+                    <td>{{ '%0.1f' % recipe.total_fat|float }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Saturated Fat</strong></td>
+                    <td>{{ '%0.1f' % recipe.saturated_fat|float }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Sodium</strong></td>
+                    <td>{{ '%0.1f' % recipe.sodium|float }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Carbohydrates</strong></td>
+                    <td>{{ '%0.1f' % recipe.carbs|float }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Sugar</strong></td>
+                    <td>{{ '%0.1f' % recipe.sugar|float }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Protein</strong></td>
+                    <td>{{ '%0.1f' % recipe.protein|float }}</td>
+                </tr>
+
+
+            </tbody>
+        </table>
+
+        <p>
+            <u><strong>Steps:</strong></u>
         </p>
 
-        <!--Make sure the form has the autocomplete function switched off:-->
-        <form autocomplete="off">
-            <div class="autocomplete" style="width:300px;">
-                <input id="myInput" type="text" name="myRecipe" placeholder="Recipe">
-            </div>
-            <input type="submit">
-        </form>
+        <ul>
+            {% for step in steps %}
+                <li>
+                     {{ step }}
+                </li>
+        {% endfor %}
+
+        </ul>
+    <a href="javascript:history.back()" style="text-decoration: none; color:darkred" type="previous">&laquo; Go Back</a>
     </div>
 
-    <script src="../static/index.js"></script>
+
 </body>
 </html>

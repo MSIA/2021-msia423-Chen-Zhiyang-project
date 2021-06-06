@@ -2,42 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link href="static/basic.css" rel="stylesheet">
+    <link href="static/index.css" rel="stylesheet">
 </head>
 
 <body>
-    <h3>
-         <a href = "{{ url_for('index') }}">Penny Lane Music Recommender</a>
-    </h3>
 
-    <hr/>
-    <table>
-         <thead>
-            <tr>
-               <th>Title</th>
-               <th>Artist</th>
-               <th>Album</th>
-            </tr>
-         </thead>
+    <div style="padding: 10px; background-color: rgba(255, 255, 255, 0.5);">
+        <h1>
+         <a href = "{{ url_for('index') }}" style="text-decoration: none; color:darkred">Recipe Recommender</a>
+        </h1>
 
-         <tbody>
-            {% for track in tracks %}
-               <tr>
-                   <td>{{ track.title }}</td>
-                   <td>{{ track.artist }}</td>
-                   <td>{{ track.album }}</td>
-               </tr>
-            {% endfor %}
-         </tbody>
-      </table>
-      <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
-      <dl>
-        <input type=text size=15 name=title placeholder="Title">
-        <input type=text size=15 name=artist placeholder="Artist">
-        <input type=text size=15 name=album placeholder="Album">
-        <input type=submit value=Add>
-      </dl>
-    </form>
+        <p>
+            This is a recipe recommender. Please search for recipe that you want to find similar substitutes.
+        </p>
 
+        <!--Make sure the form has the autocomplete function switched off:-->
+        <form autocomplete="off" method="post">
+            <div class="autocomplete" style="width:300px;">
+                <input id="myInput" type="text" name="myRecipe" placeholder="Recipe">
+            </div>
+            <input type="submit">
+        </form>
+    </div>
+    <script type="text/javascript">
+        var recipelist= {{ recipe_name|tojson }}
+    </script>
+    <script src="../static/index.js"></script>
 </body>
 </html>

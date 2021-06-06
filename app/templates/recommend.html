@@ -13,13 +13,13 @@
         </h1>
 
         <h2>
-            Recommended Recipes for <a href = "{{ url_for('recipe_page', myRecipe=current_recipe) }}">{{ current_recipe }}</a>:
+            Recommendations for <a class="capitalize" href = "{{ url_for('recipe_page', myRecipe=current_recipe) }}" style="color:black">{{ current_recipe }}</a>:
         </h2>
 
         <ul>
             {% for onerec in recommended_recipes %}
                 <li>
-                     <a href = "{{ url_for('recipe_page', myRecipe=onerec.name) }}">{{ onerec.name }}</a>
+                     <a class="capitalize" href = "{{ url_for('recipe_page', myRecipe=onerec) }}"style="color:black; line-height: 2">{{ onerec }}</a>
                 </li>
             {% endfor %}
 
