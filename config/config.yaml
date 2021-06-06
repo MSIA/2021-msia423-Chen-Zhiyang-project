@@ -1,60 +1,50 @@
-acquire:
-  acquire:
-    source_url: https://archive.ics.uci.edu/ml/machine-learning-databases/undocumented/taylor/cloud.data
-    local_dump_path: ./data/clouds.data
+s3:
+  download_file_from_s3:
+    local_paths: ['data/raw/RAW_recipes.csv', 'data/raw/RAW_interactions.csv']
+    s3paths: ['s3://2021-msia423-chen-zhiyang/raw_data/RAW_recipes.csv',
+              's3://2021-msia423-chen-zhiyang/raw_data/RAW_interactions.csv]
 
 clean:
-  clean:
-    columns:
-      - visible_mean
-      - visible_max
-      - visible_min
-      - visible_mean_distribution
-      - visible_contrast
-      - visible_entropy
-      - visible_second_angular_momentum
-      - IR_mean
-      - IR_max
-      - IR_min
-    response_tag: class
+  recipe_in_path: data/raw/RAW_recipes.csv
+  prepare_recipe:
+    prep_ingredient:
+      ing_col: ingredients
+      inglist: [ 'pepper', 'onion', 'cheese', 'garlic', 'egg', 'butter', 'flour', 'lemon', 'chicken', 'milk', 'tomato',
+                 'cream', 'baking', 'vanilla', 'cinnamon', 'parsley', 'apple', 'beef', 'potato', 'chili']
+      similarlist:
+        lime: lemon
+        cheddar: cheese
+        mozzarella: cheese
+    prep_tag:
+      tag_col: tags
+      taglist: ['dietary', 'easy', 'low-in-something', 'main-dish', 'meat', 'vegetables', 'north-american', 'desserts',
+                'healthy', 'dinner-party', 'vegetarian', 'beginner-cook', 'inexpensive', 'fruit', 'oven', 'eggs-dairy',
+                'pasta-rice-and-grains', 'kid-friendly', 'comfort-food', 'european']
+    prep_nutrition:
+      nutr_col: nutrition
+      nutritionlist: ['calories', 'total_fat', 'sugar', 'sodium', 'protein', 'saturated_fat', 'carbs']
+    step_col: 'steps'
+    strlist: ['tags', 'ingredients']
 
-featurize:
-  featurize:
-    target_column: class
-    config:
-      get_log:
-        target_col: visible_entropy
-        feature_name: log_entropy
-      get_column_multiply:
-        col1: visible_contrast
-        col2: visible_entropy
-        feature_name: entropy_x_contrast
-      get_subtraction:
-        col1: IR_max
-        col2: IR_min
-        feature_name: IR_range
-      get_subtraction_and_divide:
-        col1: IR_max
-        col2: IR_min
-        divide_col: IR_mean
-        feature_name: IR_norm_range
+  recipe_out_path: data/clean/recipes.csv
+  get_recipe:
+    droplist: ['contributor_id', 'submitted', 'tags', 'nutrition', 'description', 'ingredients', 'steps']
 
-eda_plots:
-  eda_plots:
-    plot_path: ./plots
-    target_column: class
+  rds_path: data/clean/rds.csv
+  get_rds:
+    collist: ['id', 'name', 'description', 'minutes', 'tags', 'calories', 'total_fat', 'sugar', 'sodium',
+              'protein', 'saturated_fat', 'carbs','n_ingredients', 'ingredients', 'n_steps', 'steps']
 
 model:
-  Model:
-    rf_config:
-      n_estimators: 10
-      max_depth: 10
-    model_dump_path: ./model/model.pkl
-    used_feature:
-      - log_entropy
-      - IR_norm_range
-      - entropy_x_contrast
-    target_column: class
-    test_size: 0.4
-    random_seed: 1
+  clean_data_path: data/clean/recipes.csv
+  model_data_path: model/kmeans.csv
+  kmeans_model:
+    droplist: ['id', 'name']
+    clust_col: cluster
+    n_cluster: 20
+    seed: 423
+
+  get_items:
+    id_col: id
+    name_col: name
 

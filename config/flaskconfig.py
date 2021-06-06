@@ -1,12 +1,19 @@
 import os
 DEBUG = True
-LOGGING_CONFIG = "config/logging/prod.conf"
+LOGGING_CONFIG = "config/logging/local.conf"
 PORT = 5000
 APP_NAME = "recipe-recommender"
 SQLALCHEMY_TRACK_MODIFICATIONS = True
 HOST = "0.0.0.0"
 SQLALCHEMY_ECHO = False  # If true, SQL for queries made will be printed
 MAX_ROWS_SHOW = 100
+
+# data path
+S3_PATHS = ['s3://2021-msia423-chen-zhiyang/raw_data/RAW_recipes.csv',
+            's3://2021-msia423-chen-zhiyang/raw_data/RAW_interactions.csv']
+LOCAL_RAW_PATHS = ['data/raw/RAW_recipes.csv', 'data/raw/RAW_interactions.csv']
+RDS_DATA_PATH = 'data/clean/rds.csv'
+MODEL_DATA_PATH = 'model/kmeans.csv'
 
 # Connection string
 DB_HOST = os.environ.get('MYSQL_HOST')
