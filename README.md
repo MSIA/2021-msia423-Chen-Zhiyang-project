@@ -1,7 +1,4 @@
 # MSiA423 Project: What to Cook Next?
-<!-- toc -->
-
---Develop Version--
 
 Developer: Zhiyang (Iris) Chen
 
@@ -51,6 +48,9 @@ Small samples of both of the datasets (`sample_RAW_interactions.csv` and `sample
     + [1) Create RDS MySQL Database](#1-create-rds-mysql-database)
       - [a. Set up configuration for RDS MySQL](#a-set-up-configuration-for-rds-mysql)
       - [b. Create DataBase in RDS MySQL](#b-create-database-in-rds-mysql)
+      - [c. Add a Recipe](#c-add-a-recipe)
+      - [d. Connect to RDS MySQL Database](#d-connect-to-rds-mysql-database)
+    + [2) Create Local SQLite Database](#2-create-local-sqlite-database)
      
 
 <!-- tocstop -->
@@ -148,7 +148,7 @@ The default `local_path` are <br>
 `data/sample/sample_RAW_interactions.csv`.
 
 #### 3) Download Raw Datasets from S3 Bucket
-To upload datasets, please run:
+To download datasets, please run:
 
 ```bash
 docker run -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY recipe run.py s3 --download\
@@ -190,11 +190,54 @@ and then run:
 
 ```bash
 docker run -e MYSQL_USER \
--e MYSQL_PASSWORD \
--e MYSQL_PORT \
--e DATABASE_NAME \
--e MYSQL_HOST \
+  -e MYSQL_PASSWORD \
+  -e MYSQL_PORT \
+  -e DATABASE_NAME \
+  -e MYSQL_HOST \
 recipe run.py create_db
+```
+
+##### c. Add a Recipe
+
+A function is written so that you can manually add a recipe by running the code below:
+
+```bash
+docker run -e MYSQL_USER -e MYSQL_PASSWORD -e MYSQL_PORT -e DATABASE_NAME -e MYSQL_HOST recipe run.py ingest \
+  id=<recipe id> name=<recipe name> description=<recipe description> minutes=<cook minutes> \
+  top_tags=<top tags> calories=<calories> total_fat=<total fat> sugar=<sugar> sodium=<sodium> \
+  protein=<protein> saturated_fat=<saturated_fat> carbs=<carbs> num_of_ingredients=<number of ingredients> \
+  all_ingredients=<ingredient list> num_of_steps=<number of cooking steps> steps=<detailed steps>
+```
+As you can see, this is really tedious! Thus, it is more for testing purpose.
+
+##### d. Connect to RDS MySQL Database
+
+You can also connect to the Database to see the table. With the configuration mentioned above is set up and on NU VPN, run:
+
+```bash
+docker run -it --rm \
+    mysql:5.7.33 \
+    mysql \
+    -h$MYSQL_HOST \
+    -u$MYSQL_USER \
+    -p$MYSQL_PASSWORD
+```
+
+Then you can see the database using the command:
+
+```SQL
+USE msia423_db;
+```
+To show all the tables (which should only be one, `recipes`):
+
+```SQL
+SHOW tables;
+```
+
+Then you can see the sample of the table by running:
+
+```SQL
+SELECT * FROM recipes LIMIT 5;
 ```
 
 **Note:**
@@ -214,6 +257,9 @@ By default, the command creates a database at `sqlite:///data/recipe.db`.
 You can also configure your own local SQLite database by changing the `engine_string` 
 or by modifying the configuration in `config/flaskconfig.py`.
 
+**Note:**
+1. Please notice that this database created by docker is WITHIN the container filesystem.
+Thus, you may want to use [volumes](https://docs.docker.com/storage/volumes/), or just runing the code outside of docker container.
 
 # BELOW IS NOT CHANGED
 

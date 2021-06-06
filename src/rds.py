@@ -13,7 +13,8 @@ Base = declarative_base()
 
 
 class Recipe(Base):
-    """Create a data model for the database to be set up for capturing songs.
+
+    """Create a data model for the database to be set up for capturing recipes.
 
     Args:
         Base (:obj:`sqlalchemy.ext.declarative.api.DeclarativeMeta`): declared base
