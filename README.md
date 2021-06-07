@@ -14,7 +14,7 @@ Everybody enjoys food, and preparing delicious meals can be a rewarding relaxati
 
 Users will enter the food they like (there may exist search suggestions to match a recipe that existed in the database), and there is also an option to enter what they want to use as ingredients. Then the app will recommend the top 10 recipes (made with the ingredients if provided) that are similar to the given dish and have the highest predicted scores.
 
-For example, the user likes "Mac & Cheese" and the app will recommend things like "The Ultimate Spaghetti Carbonara Recipe" and will predict the user would score 4/5 for this recipe.
+For example, the user likes "Mac & Cheese", and the app will recommend things like "The Ultimate Spaghetti Carbonara Recipe" and will predict the user would score 4/5 for this recipe.
 
 The dataset used is from [Food.com](https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions) in Kaggle. It includes both recipes and user interactions with the recipes. It has 180K+ recipes and 700K+ recipe reviews, covering 18 years of user interactions.
 
