@@ -91,7 +91,6 @@ Small samples of both of the datasets (`sample_RAW_interactions.csv` and `sample
 │   ├── archive/                      <- Develop notebooks no longer being used.
 │   ├── deliver/                      <- Notebooks shared with others / in final state
 │   ├── develop/                      <- Current notebooks being used in development.
-│   ├── template.ipynb                <- Template notebook for analysis with useful imports, helper functions, and SQLAlchemy setup. 
 │
 ├── src/                              <- Source data for the project 
 │
