@@ -4,7 +4,7 @@ from ast import literal_eval
 from flask import Flask
 from flask import render_template, request, redirect, url_for
 from src.rds import Recipe, RecipeManager
-from src.model import get_item
+from src.model import recommend
 import pandas as pd
 from config.flaskconfig import MODEL_DATA_PATH
 
@@ -21,6 +21,7 @@ app.config.from_pyfile('config/flaskconfig.py')
 
 recipe_manager = RecipeManager(app)
 model = pd.read_csv(MODEL_DATA_PATH)
+logger.debug('Model loaded.')
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -44,12 +45,12 @@ def index():
 
     if request.method == 'POST':
         myRecipe = request.form.get('myRecipe')
-        url_to_handle_request = url_for('recommend', current_recipe=myRecipe)
+        url_to_handle_request = url_for('recommendation', current_recipe=myRecipe)
         return redirect(url_to_handle_request)
 
 
 @app.route('/rec-<current_recipe>')
-def recommend(current_recipe):
+def recommendation(current_recipe):
     """ List top 10 recommended substitutions.
 
     Args:
@@ -68,7 +69,7 @@ def recommend(current_recipe):
         else:
             # model
 
-            _, recommended_recipes = get_item(current_recipe, model)
+            _, recommended_recipes = recommend(model, name=current_recipe)
             print(recommended_recipes)
             return render_template('recommend.html', current_recipe=current_recipe,
                                    recommended_recipes=recommended_recipes)
