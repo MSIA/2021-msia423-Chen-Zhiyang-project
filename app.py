@@ -70,7 +70,6 @@ def recommendation(current_recipe):
             # model
 
             _, recommended_recipes = recommend(model, name=current_recipe)
-            print(recommended_recipes)
             return render_template('recommend.html', current_recipe=current_recipe,
                                    recommended_recipes=recommended_recipes)
 
