@@ -51,7 +51,13 @@ Small samples of both of the datasets (`sample_RAW_interactions.csv` and `sample
       - [c. Add a Recipe](#c-add-a-recipe)
       - [d. Connect to RDS MySQL Database](#d-connect-to-rds-mysql-database)
     + [2) Create Local SQLite Database](#2-create-local-sqlite-database)
-  * [4. ]
+  * [4. Model Pipline](#4-model-pipeline)
+  * [5. App Deployment](#5-app-deployment)
+    + [1) Config Flask App](#1-config-flask-app)
+    + [2) Run the Flask App](#2-run-the-flask-app)
+  * [6. Testing](#6-testing)
+  
+  
      
 
 <!-- tocstop -->
@@ -143,12 +149,6 @@ To upload datasets, please run:
 docker run -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY recipe run.py s3 \
     --s3path <s3 directory path1> <s3 directory path2> \
     --local_path <local directory path1> <local directory path2>
-```
-
-or
-
-```bash
-make upload_s3
 ```
 
 The default `s3path` are <br>
@@ -385,7 +385,7 @@ make rds_app
 You should then be able to access the app at http://0.0.0.0:5000/ in your browser in any of the above method.
 
 
-# Testing
+### 6. Testing
 
 From within the Docker container, the following command should work to run unit tests when run from the root of the repository: 
 

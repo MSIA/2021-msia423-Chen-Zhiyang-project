@@ -55,12 +55,12 @@ if __name__ == '__main__':
         model_data = model.kmeans_model(data, **config['model']['kmeans_model'])
         logger.info('kmean model finished.')
 
-        model_data.to_csv(config['model']['model_data_path'], index=False)
+        model_data.to_pickle(config['model']['model_data_path'])
         logger.info("kmeans result saved.")
 
     elif args.step == 'evaluate':
         interaction = pd.read_csv(config['clean']['interaction_out_path'])
-        model = pd.read_csv(config['model']['model_data_path'])
+        model = pd.read_pickle(config['model']['model_data_path'])
         avg_ndcg = evaluation.evaluation(interaction, model, **config['evaluate']['evaluation'])
         result = f"Average NDCG for the model is {avg_ndcg}."
         logger.info(result)

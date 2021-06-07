@@ -13,7 +13,7 @@ S3_PATHS = ['s3://2021-msia423-chen-zhiyang/raw_data/RAW_recipes.csv',
             's3://2021-msia423-chen-zhiyang/raw_data/RAW_interactions.csv']
 LOCAL_RAW_PATHS = ['data/raw/RAW_recipes.csv', 'data/raw/RAW_interactions.csv']
 RDS_DATA_PATH = 'data/clean/rds.csv'
-MODEL_DATA_PATH = 'model/kmeans.csv'
+MODEL_DATA_PATH = 'model/kmeans.pkl'
 
 # Connection string
 DB_HOST = os.environ.get('MYSQL_HOST')

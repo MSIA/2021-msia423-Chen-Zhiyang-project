@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-run_local_app
+python3 app.py

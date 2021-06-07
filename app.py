@@ -20,8 +20,9 @@ app = Flask(__name__, template_folder="app/templates", static_folder="app/static
 app.config.from_pyfile('config/flaskconfig.py')
 
 recipe_manager = RecipeManager(app)
-model = pd.read_csv(MODEL_DATA_PATH)
-logger.debug('Model loaded.')
+model = pd.read_pickle(MODEL_DATA_PATH)
+logger.info('Model loaded.')
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():

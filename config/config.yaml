@@ -47,7 +47,7 @@ clean:
 
 model:
   clean_data_path: data/clean/recipes.csv
-  model_data_path: model/kmeans.csv
+  model_data_path: model/kmeans.pkl
   kmeans_model:
     droplist: ['id', 'name']
     clust_col: cluster
