@@ -2,7 +2,7 @@ s3:
   download_file_from_s3:
     local_paths: ['data/raw/RAW_recipes.csv', 'data/raw/RAW_interactions.csv']
     s3paths: ['s3://2021-msia423-chen-zhiyang/raw_data/RAW_recipes.csv',
-              's3://2021-msia423-chen-zhiyang/raw_data/RAW_interactions.csv]
+              's3://2021-msia423-chen-zhiyang/raw_data/RAW_interactions.csv']
 
 clean:
   recipe_in_path: data/raw/RAW_recipes.csv
@@ -35,6 +35,16 @@ clean:
     collist: ['id', 'name', 'description', 'minutes', 'tags', 'calories', 'total_fat', 'sugar', 'sodium',
               'protein', 'saturated_fat', 'carbs','n_ingredients', 'ingredients', 'n_steps', 'steps']
 
+  interaction_in_path: data/raw/RAW_interactions.csv
+  interaction_out_path: data/clean/interactions.csv
+  prepare_interactions:
+    uid_col: user_id
+    rid_col: recipe_id
+    rating_col: rating
+    list_col: list
+    count_col: count
+    top_n: 10
+
 model:
   clean_data_path: data/clean/recipes.csv
   model_data_path: model/kmeans.csv
@@ -47,4 +57,14 @@ model:
   get_items:
     id_col: id
     name_col: name
+    top_n: 10
 
+evaluate:
+  result_path: model/result.txt
+  evaluation:
+    clust_col: cluster
+    list_col: list
+    rating_col: rating
+    rank_col: rank
+    id_col: id
+    top_n: 10
