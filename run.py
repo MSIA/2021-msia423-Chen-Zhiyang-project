@@ -10,8 +10,6 @@ from config.flaskconfig import SQLALCHEMY_DATABASE_URI, RDS_DATA_PATH, S3_PATHS,
 logging.config.fileConfig(LOGGING_CONFIG)
 logger = logging.getLogger(__name__)
 
-
-
 if __name__ == '__main__':
     # Add parsers for
     # 1. uploading to or downloading from s3
