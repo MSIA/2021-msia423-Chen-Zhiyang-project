@@ -19,7 +19,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="")
 
     parser.add_argument('step', help='Which step to run',
-                        choices=['acquire', 'clean', 'model', 'evaluation'])
+                        choices=['acquire', 'clean', 'model', 'evaluate'])
     parser.add_argument('--config', default='config/config.yaml', help='Path to configuration file')
 
     args = parser.parse_args()
@@ -34,17 +34,21 @@ if __name__ == '__main__':
 
     elif args.step == 'clean':
         recipe = pd.read_csv(config['clean']['recipe_in_path'])
+        interaction = pd.read_csv(config['clean']['interaction_in_path'])
         clean_recipe = clean.prepare_recipe(recipe, config['clean']['prepare_recipe'])
         logger.debug("recipe data cleaned.")
         prepared_recipe = clean.get_recipe(clean_recipe, **config['clean']['get_recipe'])
         logger.debug("prepared recipe data.")
         prepared_rds = clean.get_rds(clean_recipe, **config['clean']['get_rds'])
         logger.debug("prepared rds data.")
+        prepared_interactions = clean.prepare_interactions(interaction, **config['clean']['prepare_interactions'])
+        logger.debug("prepared interaction data.")
 
         # write data to folder
         prepared_recipe.to_csv(config['clean']['recipe_out_path'], index=False)
         prepared_rds.to_csv(config['clean']['rds_path'], index=False)
-        logger.info("prepared recipe and rds data saved.")
+        prepared_interactions.to_csv(config['clean']['interaction_out_path'], index=False)
+        logger.info("prepared recipe, interactions and rds data saved.")
 
     elif args.step == 'model':
         data = pd.read_csv(config['model']['clean_data_path'])
@@ -55,4 +59,11 @@ if __name__ == '__main__':
         logger.info("kmeans result saved.")
 
     elif args.step == 'evaluate':
-        eda_plots.eda_plots(data, **config['eda_plots']['eda_plots'])
+        interaction = pd.read_csv(config['clean']['interaction_out_path'])
+        model = pd.read_csv(config['model']['model_data_path'])
+        avg_ndcg = evaluation.evaluation(interaction, model, **config['evaluate']['evaluation'])
+        result = f"Average NDCG for the model is {avg_ndcg}."
+        logger.info(result)
+        with open(config['evaluate']['result_path'], "w") as f:
+            f.write(result)
+        logger.info("Evaluation result exported.")
