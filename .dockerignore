@@ -1,0 +1,6 @@
+data/clean/*
+data/raw/*
+data/sample/*
+.git
+*.ipynb
+*.sh
