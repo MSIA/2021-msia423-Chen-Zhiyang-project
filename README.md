@@ -14,7 +14,7 @@ Everybody enjoys food, and preparing delicious meals can be a rewarding relaxati
 
 Users will enter the food they like (there may exist search suggestions to match a recipe that existed in the database), and there is also an option to enter what they want to use as ingredients. Then the app will recommend the top 10 recipes (made with the ingredients if provided) that are similar to the given dish and have the highest predicted scores.
 
-For example, the user likes "Mac & Cheese" and the app will recommend things like "The Ultimate Spaghetti Carbonara Recipe" and will predict the user would score 4/5 for this recipe.
+For example, the user likes "Mac & Cheese", and the app will recommend things like "The Ultimate Spaghetti Carbonara Recipe" and will predict the user would score 4/5 for this recipe.
 
 The dataset used is from [Food.com](https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions) in Kaggle. It includes both recipes and user interactions with the recipes. It has 180K+ recipes and 700K+ recipe reviews, covering 18 years of user interactions.
 
@@ -22,7 +22,7 @@ The dataset used is from [Food.com](https://www.kaggle.com/shuyangli94/food-com-
 ### Success Criteria
 
 #### 1. Model Performance Metric:
-The model will be tested on the Food.com users interaction dataset. For the recommender system, mAP and nDCG will be used. An ideal nDCG will be higher than 0.7. For the predicted score, the desired Cross-Validation R-squared prior to deployment is 0.7.
+The model will be tested on the Food.com users interaction dataset. For the recommender system, nDCG will be used. An ideal nDCG will be higher than 0.7.
 
 #### 2. Business Metrics:
 Ideally, an A/B testing should be conducted. Two metrics should be considered: the amount of time spent to find out recipes and the ratings for the new recipe. We would compare between the group of users who select new recipe using the app and the group who do not.
@@ -51,6 +51,13 @@ Small samples of both of the datasets (`sample_RAW_interactions.csv` and `sample
       - [c. Add a Recipe](#c-add-a-recipe)
       - [d. Connect to RDS MySQL Database](#d-connect-to-rds-mysql-database)
     + [2) Create Local SQLite Database](#2-create-local-sqlite-database)
+  * [4. Model Pipline](#4-model-pipeline)
+  * [5. App Deployment](#5-app-deployment)
+    + [1) Config Flask App](#1-config-flask-app)
+    + [2) Run the Flask App](#2-run-the-flask-app)
+  * [6. Testing](#6-testing)
+  
+  
      
 
 <!-- tocstop -->
@@ -60,7 +67,7 @@ Small samples of both of the datasets (`sample_RAW_interactions.csv` and `sample
 ```
 ├── README.md                         <- You are here
 ├── api
-│   ├── static/                       <- CSS, JS files that remain static
+│   ├── static/                       <- CSS, JS, JPEG files that remain static
 │   ├── templates/                    <- HTML (or other code) that is templated and changes based on a set of inputs
 │   ├── boot.sh                       <- Start up script for launching app in Docker container.
 │   ├── Dockerfile                    <- Dockerfile for building image to run app  
@@ -69,18 +76,16 @@ Small samples of both of the datasets (`sample_RAW_interactions.csv` and `sample
 │   ├── local/                        <- Directory for keeping environment variables and other local configurations that *do not sync** to Github 
 │   ├── logging/                      <- Configuration of python loggers
 │   ├── flaskconfig.py                <- Configurations for Flask API 
+│   ├── config.yaml                   <- YAML Configurations for model
 │
-├── data                              <- Folder that contains data used or generated. Only the external/ and sample/ subdirectories are tracked by git. 
-│   ├── external/                     <- External data sources, usually reference data,  will be synced with git
+├── data                              <- Folder that contains data used or generated. Only the sample/ subdirectories are tracked by git. 
 │   ├── sample/                       <- Sample data used for code development and testing, will be synced with git
 │
 ├── deliverables/                     <- Any white papers, presentations, final work products that are presented or delivered to a stakeholder 
 │
 ├── docs/                             <- Sphinx documentation based on Python docstrings. Optional for this project. 
 │
-├── figures/                          <- Generated graphics and figures to be used in reporting, documentation, etc
-│
-├── models/                           <- Trained model objects (TMOs), model predictions, and/or model summaries
+├── models/                           <- Trained model objects (TMOs), model predictions, and/or model summaries. Kmeans result saved to here.
 │
 ├── notebooks/
 │   ├── archive/                      <- Develop notebooks no longer being used.
@@ -88,15 +93,16 @@ Small samples of both of the datasets (`sample_RAW_interactions.csv` and `sample
 │   ├── develop/                      <- Current notebooks being used in development.
 │   ├── template.ipynb                <- Template notebook for analysis with useful imports, helper functions, and SQLAlchemy setup. 
 │
-├── reference/                        <- Any reference material relevant to the project
-│
 ├── src/                              <- Source data for the project 
 │
 ├── test/                             <- Files necessary for running model tests (see documentation below) 
 │
 ├── app.py                            <- Flask wrapper for running the model 
-├── run.py                            <- Simplifies the execution of one or more of the src scripts  
+├── run.py                            <- Simplifies the execution of one or more of the src scripts on data pipeline
+├── run_model.py                      <- Simplifies the execution of one or more of the src scripts on model pipeline 
 ├── requirements.txt                  <- Python package dependencies 
+├── Dockerfile                        <- Dockerfile for building image 
+├── Makefile                          <- Simplifies the execution of commands
 ```
 
 ## Database Management Using Docker
@@ -112,6 +118,12 @@ To build the image, run from this directory (the root of the repo):
 
 ```bash
  docker build -t recipe .
+```
+
+or
+
+```bash
+make image
 ```
 
 This command builds the Docker image, with the tag `recipe`, based on the instructions in `Dockerfile` and the files existing in this directory.
@@ -156,6 +168,12 @@ docker run -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY recipe run.py s3 --down
     --local_path <local directory path1> <local directory path2>
 ```
 
+or
+
+```bash
+make acquire
+```
+
 The default `s3path` and `local_path` are the same as upload.
 
 **Notes:**
@@ -197,18 +215,27 @@ docker run -e MYSQL_USER \
 recipe run.py create_db
 ```
 
-##### c. Add a Recipe
-
-A function is written so that you can manually add a recipe by running the code below:
+or
 
 ```bash
-docker run -e MYSQL_USER -e MYSQL_PASSWORD -e MYSQL_PORT -e DATABASE_NAME -e MYSQL_HOST recipe run.py ingest \
-  id=<recipe id> name=<recipe name> description=<recipe description> minutes=<cook minutes> \
-  top_tags=<top tags> calories=<calories> total_fat=<total fat> sugar=<sugar> sodium=<sodium> \
-  protein=<protein> saturated_fat=<saturated_fat> carbs=<carbs> num_of_ingredients=<number of ingredients> \
-  all_ingredients=<ingredient list> num_of_steps=<number of cooking steps> steps=<detailed steps>
+make create_rds_db
 ```
-As you can see, this is really tedious! Thus, it is more for testing purpose.
+
+##### c. Add Recipes
+
+To add all data to RDS, run:
+
+```bash
+docker run -e MYSQL_USER -e MYSQL_PASSWORD -e MYSQL_PORT -e DATABASE_NAME -e MYSQL_HOST \
+	recipe run.py ingest --data_path=data/clean/rds.csv
+  ```
+
+or 
+
+```bash
+make ingest_rds
+```
+
 
 ##### d. Connect to RDS MySQL Database
 
@@ -253,42 +280,57 @@ will be set to a local SQLite database.
 docker run recipe run.py create_db --engine_string=<engine_string>
 ```
 
+or
+
+```bash
+make create_local_db
+```
+
 By default, the command creates a database at `sqlite:///data/recipe.db`. 
 You can also configure your own local SQLite database by changing the `engine_string` 
 or by modifying the configuration in `config/flaskconfig.py`.
+
+To ingest all data to local db, run:
+
+```bash
+make ingest_local
+```
 
 **Note:**
 1. Please notice that this database created by docker is WITHIN the container filesystem.
 Thus, you may want to use [volumes](https://docs.docker.com/storage/volumes/), or just runing the code outside of docker container.
 
-# BELOW IS NOT CHANGED
 
+### 4. Model Pipeline
 
-#### Defining your engine string 
-A SQLAlchemy database connection is defined by a string with the following format:
+Model pipeline includes 4 steps: data acquisition (can be ignored if already acquired data from s3), 
+data cleaning, model building and model evaluation.
 
-`dialect+driver://username:password@host:port/database`
+The easiest way to run the entire pipeline is to run:
 
-The `+dialect` is optional and if not provided, a default is used. For a more detailed description of what `dialect` and `driver` are and how a connection is made, you can see the documentation [here](https://docs.sqlalchemy.org/en/13/core/engines.html). We will cover SQLAlchemy and connection strings in the SQLAlchemy lab session on 
-##### Local SQLite database 
-
-A local SQLite database can be created for development and local testing. It does not require a username or password and replaces the host and port with the path to the database file: 
-
-```python
-engine_string='sqlite:///data/tracks.db'
-
+```bash
+make model_pipeline
 ```
 
-The three `///` denote that it is a relative path to where the code is being run (which is from the root of this directory).
-
-You can also define the absolute path with four `////`, for example:
-
-```python
-engine_string = 'sqlite://///Users/cmawer/Repos/2020-MSIA423-template-repository/data/tracks.db'
+Or to run each step individually, run:
+```bash
+make acquire
+```
+```bash
+make clean
+```
+```bash
+make model
+```
+```bash
+make evaluation
 ```
 
+The average nDCG achieved by this model is about 0.73.
 
-### 2. Configure Flask app 
+### 5. App Deployment
+
+#### 1) Config Flask App
 
 `config/flaskconfig.py` holds the configurations for the Flask app. It includes the following configurations:
 
@@ -304,33 +346,62 @@ SQLALCHEMY_ECHO = False  # If true, SQL for queries made will be printed
 MAX_ROWS_SHOW = 100 # Limits the number of rows returned from the database 
 ```
 
-### 3. Run the Flask app 
+#### 2) Run the Flask app 
 
-To run the Flask app, run: 
+To run the Flask app locally and without docker, run: 
 
 ```bash
 python app.py
 ```
 
-You should now be able to access the app at http://0.0.0.0:5000/ in your browser.
+To run the Flask app in Docker with local database, run:
 
-# Testing
+
+```bash
+docker run -p 5000:5000 recipe app.py
+```
+
+or 
+
+```bash
+make local_app
+```
+
+To run the Flask app in Docker with RDS, run:
+
+```bash
+docker run -it -e AWS_ACCESS_KEY_ID \
+-e AWS_SECRET_ACCESS_KEY -e MYSQL_HOST \
+-e MYSQL_PORT -e MYSQL_USER -e MYSQL_PASSWORD \
+-e DATABASE_NAME -p 5000:5000 recipe app.py
+```
+
+or
+
+```bash
+make rds_app
+```
+
+You should then be able to access the app at http://0.0.0.0:5000/ in your browser in any of the above method.
+
+
+### 6. Testing
 
 From within the Docker container, the following command should work to run unit tests when run from the root of the repository: 
 
 ```bash
 python -m pytest
-``` 
-
-Using Docker, run the following, if the image has not been built yet:
-
-```bash
- docker build -f app/Dockerfile_python -t pennylane .
 ```
 
 To run the tests, run: 
 
 ```bash
- docker run penny -m pytest
+ docker run recipe -m pytest
+```
+
+or
+
+```bash
+make tests
 ```
  

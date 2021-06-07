@@ -17,5 +17,9 @@ venv/
 *.sh
 *.db
 config/local
-
+food_data
 !.gitkeep
+data/*
+copilot/*
+docs/
+Testing.ipynb

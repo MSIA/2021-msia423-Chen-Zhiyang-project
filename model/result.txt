@@ -1,0 +1,1 @@
+Average NDCG for the model is 0.7339816503840267.
