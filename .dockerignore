@@ -5,3 +5,4 @@ data/sample/*
 notebooks/*
 *.sh
 *.db
+deliverables/*

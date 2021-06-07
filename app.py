@@ -23,6 +23,10 @@ recipe_manager = RecipeManager(app)
 model = pd.read_pickle(MODEL_DATA_PATH)
 logger.info('Model loaded.')
 
+query = recipe_manager.session.query(Recipe.name).all()
+recipe_name_list = [row[0] for row in query]
+logger.info('Names cached.')
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -36,9 +40,7 @@ def index():
     """
     if request.method == 'GET':
         try:
-            query = recipe_manager.session.query(Recipe.name).all()
-            recipe_name = [row[0] for row in query]
-            return render_template('index.html', recipe_name=recipe_name)
+            return render_template('index.html', recipe_name=recipe_name_list)
         except:
             traceback.print_exc()
             logger.warning("error encountered, error page returned.")
