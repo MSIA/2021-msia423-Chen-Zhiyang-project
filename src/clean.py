@@ -1,4 +1,5 @@
 import logging.config
+import pandas as pd
 from ast import literal_eval
 
 logger = logging.getLogger(__name__)
@@ -114,6 +115,7 @@ def prepare_recipe(data, config):
     recipes = recipes.dropna()
     return recipes
 
+
 def get_recipe(prepared_recipe, droplist):
     """ Get reciple data ready for model
 
@@ -145,5 +147,29 @@ def get_rds(prepared_recipe, collist):
     data = prepared_recipe[[col for col in collist]]
     return data
 
-def prepare_interactions():
-    return
+
+def prepare_interactions(rawdata, uid_col='user_id', rid_col='recipe_id', rating_col='rating', list_col='list',
+                         count_col='count', top_n=10):
+    """ clean up interaction data for evaluation
+
+    Args:
+        rawdata (:obj:`pandas.DataFrame`): raw interaction data
+        uid_col (str): name of user id column. default = user_id
+        rid_col (str): name of recipe id column. default = recipe_id
+        rating_col (str): name of rating column. default = rating
+        list_col (str): name of list of ratings column. default = list
+        count_col (str): name of count column. default = count
+        top_n (int): keep active users with more than n ratings
+
+    Returns:
+        ratinglist (:obj:`pandas.DataFrame`): cleaned interaction data
+
+    """
+    interactions = rawdata[[uid_col, rid_col, rating_col]]
+    ratinglist = pd.DataFrame(interactions.groupby(uid_col)[[rid_col, rating_col]]
+                              .apply(lambda x: sorted(list(x.values.tolist()), key=lambda y: y[1], reverse=True)),
+                              columns=[list_col])
+    ratinglist[count_col] = ratinglist.apply(lambda x: len(x[list_col]), axis=1)
+    ratinglist = ratinglist[ratinglist[count_col] > top_n].sort_values('count', ascending=False)
+
+    return ratinglist
