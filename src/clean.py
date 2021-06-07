@@ -1,6 +1,7 @@
 import logging.config
-import pandas as pd
 from ast import literal_eval
+
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 

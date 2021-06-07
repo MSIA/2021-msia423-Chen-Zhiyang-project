@@ -1,7 +1,7 @@
 import logging.config
-import sqlalchemy
-import pandas as pd
 
+import pandas as pd
+import sqlalchemy
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, Integer, String, Numeric
 from sqlalchemy.ext.declarative import declarative_base
@@ -13,7 +13,6 @@ Base = declarative_base()
 
 
 class Recipe(Base):
-
     """Create a data model for the database to be set up for capturing recipes.
 
     Args:

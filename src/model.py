@@ -2,8 +2,8 @@ import logging.config
 import sys
 
 from sklearn import preprocessing
-from sklearn.metrics.pairwise import linear_kernel
 from sklearn.cluster import KMeans
+from sklearn.metrics.pairwise import linear_kernel
 
 logger = logging.getLogger(__name__)
 

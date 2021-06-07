@@ -1,7 +1,9 @@
 import logging.config
-import pandas as pd
-import numpy as np
 from ast import literal_eval
+
+import numpy as np
+import pandas as pd
+
 import src.model as model
 
 logger = logging.getLogger(__name__)
