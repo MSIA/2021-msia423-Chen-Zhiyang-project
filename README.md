@@ -116,7 +116,7 @@ The Dockerfile for accessing s3 bucket and building database is in the root.
 To build the image, run from this directory (the root of the repo): 
 
 ```bash
- docker build -t recipe .
+ docker build -t recipe_zcm9834 .
 ```
 
 or
@@ -125,7 +125,7 @@ or
 make image
 ```
 
-This command builds the Docker image, with the tag `recipe`, based on the instructions in `Dockerfile` and the files existing in this directory.
+This command builds the Docker image, with the tag `recipe_zcm9834`, based on the instructions in `Dockerfile` and the files existing in this directory.
 
 The entry point is `python3`, and thus when you run the image as a container, the command python3 is run, followed by the arguments given in the docker run command after the image name.
 
@@ -145,7 +145,7 @@ export AWS_SECRET_ACCESS_KEY=<Your AWS Access Key>
 To upload datasets, please run:
 
 ```bash
-docker run -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY recipe run.py s3 \
+docker run -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY recipe_zcm9834 run.py s3 \
     --s3path <s3 directory path1> <s3 directory path2> \
     --local_path <local directory path1> <local directory path2>
 ```
@@ -162,7 +162,7 @@ The default `local_path` are <br>
 To download datasets, please run:
 
 ```bash
-docker run -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY recipe run.py s3 --download\
+docker run -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY recipe_zcm9834 run.py s3 --download\
     --s3path <s3 directory path1> <s3 directory path2> \
     --local_path <local directory path1> <local directory path2>
 ```
@@ -211,7 +211,7 @@ docker run -e MYSQL_USER \
   -e MYSQL_PORT \
   -e DATABASE_NAME \
   -e MYSQL_HOST \
-recipe run.py create_db
+recipe_zcm9834 run.py create_db
 ```
 
 or
@@ -226,7 +226,7 @@ To add all data to RDS, run:
 
 ```bash
 docker run -e MYSQL_USER -e MYSQL_PASSWORD -e MYSQL_PORT -e DATABASE_NAME -e MYSQL_HOST \
-	recipe run.py ingest --data_path=data/clean/rds.csv
+	recipe_zcm9834 run.py ingest --data_path=data/clean/rds.csv
   ```
 
 or 
@@ -276,7 +276,7 @@ You can also create a local SQLite database. If no `MYSQL_HOST` provided, the `S
 will be set to a local SQLite database. 
 
 ```bash
-docker run recipe run.py create_db --engine_string=<engine_string>
+docker run recipe_zcm9834 run.py create_db --engine_string=<engine_string>
 ```
 
 or
@@ -357,7 +357,7 @@ To run the Flask app in Docker with local database, run:
 
 
 ```bash
-docker run -p 5000:5000 recipe app.py
+docker run -p 5000:5000 recipe_zcm9834 app.py
 ```
 
 or 
@@ -372,7 +372,7 @@ To run the Flask app in Docker with RDS, run:
 docker run -it -e AWS_ACCESS_KEY_ID \
 -e AWS_SECRET_ACCESS_KEY -e MYSQL_HOST \
 -e MYSQL_PORT -e MYSQL_USER -e MYSQL_PASSWORD \
--e DATABASE_NAME -p 5000:5000 recipe app.py
+-e DATABASE_NAME -p 5000:5000 recipe_zcm9834 app.py
 ```
 
 or
@@ -395,7 +395,7 @@ python -m pytest
 To run the tests, run: 
 
 ```bash
- docker run recipe -m pytest
+ docker run recipe_zcm9834 -m pytest
 ```
 
 or

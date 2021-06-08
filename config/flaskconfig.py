@@ -1,6 +1,6 @@
 import os
 DEBUG = True
-LOGGING_CONFIG = "config/logging/local.conf"
+LOGGING_CONFIG = "config/logging/prod.conf"
 PORT = 5000
 APP_NAME = "recipe-recommender"
 SQLALCHEMY_TRACK_MODIFICATIONS = True

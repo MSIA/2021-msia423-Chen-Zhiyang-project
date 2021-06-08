@@ -8,9 +8,6 @@ from src.model import recommend
 import pandas as pd
 from config.flaskconfig import MODEL_DATA_PATH
 
-from config.flaskconfig import LOGGING_CONFIG
-
-# logging.config.fileConfig(LOGGING_CONFIG)
 logger = logging.getLogger(__name__)
 
 # Initialize the Flask application

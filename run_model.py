@@ -62,8 +62,7 @@ if __name__ == '__main__':
         interaction = pd.read_csv(config['clean']['interaction_out_path'])
         model = pd.read_pickle(config['model']['model_data_path'])
         avg_ndcg = evaluation.evaluation(interaction, model, **config['evaluate']['evaluation'])
-        result = f"Average NDCG for the model is {avg_ndcg}."
-        logger.info(result)
-        with open(config['evaluate']['result_path'], "w") as f:
-            f.write(result)
+        result = pd.DataFrame({'Avg_nDCG': avg_ndcg}, index=[0])
+        logger.info(f"Average nDCG for the model is {avg_ndcg}.")
+        result.to_csv(config['evaluate']['result_path'], index=False)
         logger.info("Evaluation result exported.")

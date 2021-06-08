@@ -60,7 +60,7 @@ model:
     top_n: 10
 
 evaluate:
-  result_path: model/result.txt
+  result_path: model/result.csv
   evaluation:
     clust_col: cluster
     list_col: list
