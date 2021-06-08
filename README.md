@@ -358,7 +358,7 @@ To run the Flask app in Docker with local database, run:
 
 
 ```bash
-docker run -p 5000:5000 recipe_zcm9834 app.py
+docker run -p 5000:5000 recipe_app_zcm9834
 ```
 
 or 
@@ -373,7 +373,7 @@ To run the Flask app in Docker with RDS, run:
 docker run -it -e AWS_ACCESS_KEY_ID \
 -e AWS_SECRET_ACCESS_KEY -e MYSQL_HOST \
 -e MYSQL_PORT -e MYSQL_USER -e MYSQL_PASSWORD \
--e DATABASE_NAME -p 5000:5000 recipe_zcm9834 app.py
+-e DATABASE_NAME -p 5000:5000 recipe_app_zcm9834
 ```
 
 or
